@@ -1,4 +1,6 @@
+
 const Student = require('../models/studentModel');
+
 
 // Get all students
 exports.getAllStudents = async (req, res) => {
@@ -13,11 +15,30 @@ exports.getAllStudents = async (req, res) => {
 // Get a single student by ID
 exports.getStudentById = async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id);
+        const student = await Student.findOne({ studentId: req.params.id });
         if (!student) {
-            return res.status(404).json({ message: 'Student not found' });
+            return res.status(404).json({ success: false, message: 'Student not found' });
         }
-        res.status(200).json(student);
+        res.status(200).json({ success: true, student });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// // Get a single student Application List 
+exports.getApplicationBystudentId = async (req, res) => {
+    try {
+        const student = await Student.findOne({ studentId: req.params.id },{ new: true })
+            .populate({
+            path: 'applications.jobId',
+            model: 'Job',
+            }).exec();
+
+        if (!student) {
+            return res.status(404).json({ success: false, message: 'Student not found' });
+        }
+
+        res.status(200).json({ success: true, applications: student.applications });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -57,5 +78,15 @@ exports.deleteStudent = async (req, res) => {
         res.status(200).json({ message: 'Student deleted' });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+// Get all applications of a student
+exports.getApplications = async (req, res) => {
+    try {
+        const student = await Student.findById(req.user.id).populate('applications');
+        res.status(200).json({success:true, applications: student.applications});
+    } catch (error) {
+        res.status(500).json({success:false , message: error.message });
     }
 };

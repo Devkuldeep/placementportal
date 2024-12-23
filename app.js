@@ -8,12 +8,16 @@ const morgan = require('morgan');
 const createError = require('http-errors');
 const mongoose = require('mongoose');
 const path = require('path');
+const { query,body, matchedData, validationResult } = require('express-validator');
+
 
 const collegeRoute = require('./routes/collegeRoute');
 const companyRoute = require('./routes/companyRoute');
 const studentRoute = require('./routes/studentRoute');
 const jobRoute = require('./routes/jobRoute');
 const connectDB = require('./lib/dbConfig');
+const authRouter = require('./routes/authRouter');
+
 
 // Load environment variables
 dotenv.config();
@@ -23,7 +27,10 @@ const app = express();
 
 // Middleware setup
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+     origin: 'http://localhost:5173',
+    credentials: true
+}))
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -36,9 +43,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 connectDB();
 
 // Default route
-app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to Campus Recruitment System' });
-});
+app.get('/api/', query('person').notEmpty().escape(), (req, res) => {
+    const result = validationResult(req);
+  if (result.isEmpty()) {
+    const data = matchedData(req);
+    
+
+    return res.send(`Hello, ${data.person}!`);
+  }
+
+  res.send({ errors: result.array() });
+  });
+
+//Auth routes
+app.use('/api/auth', authRouter);
+
+
 // Routes
 app.use('/api/college', collegeRoute);
 app.use('/api/company', companyRoute);
@@ -60,7 +80,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

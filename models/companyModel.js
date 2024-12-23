@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 const companySchema = new mongoose.Schema({
+    companyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,       
+        ref: 'User',
+    },  
     companyName: {
         type: String,
         required: true,
@@ -29,23 +34,21 @@ const companySchema = new mongoose.Schema({
     companyType: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        enum: ['STARTUP', 'MNC', 'SME', 'GOVERNMENT', 'NGO', 'OTHERS']
     },
     industryType: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        enum: ['IT', 'FINANCE', 'MARKETING', 'EDUCATION', 'HEALTHCARE', 'OTHERS']
     },
     companyAddress: {
         type: String,
         required: true,
         trim: true
     },
-    numberOfEmployees: {
-        type: Number,
-        required: true,
-        min: 1
-    },
+   
     companyDescription: {
         type: String,
         required: true,
@@ -59,10 +62,11 @@ const companySchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+  
+    jobPostings: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Job'
+    }]
 });
 
 const Company = mongoose.model('Company', companySchema);

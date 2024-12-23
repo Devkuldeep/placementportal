@@ -1,23 +1,15 @@
 const Company = require('../models/companyModel');
 
-// Get all companies
-exports.getAllCompanies = async (req, res) => {
-    try {
-        const companies = await Company.find();
-        res.status(200).json(companies);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+
 
 // Get a single company by ID
 exports.getCompanyById = async (req, res) => {
     try {
-        const company = await Company.findById(req.params.id);
+        const company = await Company.findOne({ companyId: req.params.id });
         if (!company) {
-            return res.status(404).json({ message: 'Company not found' });
+            return res.status(404).json({ success: false, message: 'Company not found' });
         }
-        res.status(200).json(company);
+        res.status(200).json({ success: true, company });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -28,9 +20,9 @@ exports.createCompany = async (req, res) => {
     const company = new Company(req.body);
     try {
         const newCompany = await company.save();
-        res.status(201).json(newCompany);
+        res.status(201).json({success:true,newCompany});
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({success:false, message: error.message });
     }
 };
 
@@ -59,3 +51,15 @@ exports.deleteCompany = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+
+// Get all companies
+exports.getAllCompanies = async (req, res) => {
+    try {
+        const companies = await Company.find();
+        res.status(200).json(companies);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+

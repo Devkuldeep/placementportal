@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const studentSchema = new mongoose.Schema({
+   
     name: {
         type: String,
         required: true
@@ -8,47 +9,50 @@ const studentSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-       
     },
     studentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,       
+        ref: 'User'
+    },
+    gender: { 
+        type: String,
+         enum: ['male', 'female', 'other'], 
+         required: true },
+
+    dateOfBirth: {
+         type: String,
+          required: true },
+
+    phoneNumber: {
         type: String,
         required: true,
-        unique: true
+        minlength: 10,        
     },
-    department: {
-        type: String,
-        required: true
-    },
-    course: {
-        type: String,
-        required: true
-    },
-    cgpa: {
-        type: Number,
-        required: true
-    },
+
+
     resume: {
         type: String // URL to stored resume
     },
-    skills: [{
+    skills: {
         type: String
-    }],
-    experience: [{
-        title: String,
-        company: String,
-        duration: String,
-        description: String
-    }],
+    },
+
+
     education: {
         tenth: {
             percentage: Number,
             board: String,
-            yearOfPassing: Number
+            yearOfPassing: String
         },
         twelfth: {
             percentage: Number,
+            stream:{
+                type:String,
+                enum:['science','commerce','arts','math']
+            },
             board: String,
-            yearOfPassing: Number
+            yearOfPassing: String
         },
         ug: {
             isCompleted: {
@@ -57,26 +61,26 @@ const studentSchema = new mongoose.Schema({
             },
             cgpa: {
                 type: Number,
-                required: function() {
-                    return this.education.ug.isCompleted;
+                required() {
+                    return this.isCompleted;
                 }
             },
             university: {
                 type: String,
-                required: function() {
-                    return this.education.ug.isCompleted;
+                required() {
+                    return this.isCompleted;
                 }
             },
             course: {
                 type: String,
-                required: function() {
-                    return this.education.ug.isCompleted;
+                required() {
+                    return this.isCompleted;
                 }
             },
             yearOfPassing: {
-                type: Number,
-                required: function() {
-                    return this.education.ug.isCompleted;
+                type: String,
+                required() {
+                    return this.isCompleted;
                 }
             }
         },
@@ -87,58 +91,47 @@ const studentSchema = new mongoose.Schema({
             },
             cgpa: {
                 type: Number,
-                required: function() {
-                    return this.education.pg.isCompleted;
+                required() {
+                    return this.isCompleted;
                 }
             },
             university: {
                 type: String,
-                required: function() {
-                    return this.education.pg.isCompleted;
+                required() {
+                    return this.isCompleted;
                 }
             },
             course: {
                 type: String,
-                required: function() {
-                    return this.education.pg.isCompleted;
+                required() {
+                    return this.isCompleted;
                 }
             },
             yearOfPassing: {
-                type: Number,
-                required: function() {
-                    return this.education.pg.isCompleted;
+                type: String,
+                required() {
+                    return this.isCompleted;
                 }
             }
         }
     },
+   
     placementStatus: {
-        isPlaced: {
-            type: Boolean,
-            default: false
-        },
-        company: String,
-        package: Number,
-        jobRole: String
+        type: Boolean,
+        default: false
     },
-    appliedJobs: [{
+    applications: [{// Array of job applications 
         jobId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Job'
         },
-        status: {
+        status: {//company should be able to change the status of application
             type: String,
             enum: ['pending', 'accepted', 'rejected'],
             default: 'pending'
         }
     }],
-    phoneNumber: {
-        type: String,
-        required: true
-    },
-    linkedin: {
-        type: String,
-        trim: true
-    }
+ 
 }, {
     timestamps: true
 });
