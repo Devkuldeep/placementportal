@@ -3,9 +3,7 @@ node_modules/
 /vendor/
 chai-backend/
 # Environment variables
-.env
-.env.local
-.env.*.local
+
 
 # Logs
 logs/
